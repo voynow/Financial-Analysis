@@ -14,10 +14,10 @@ from fill_nans import fill_nans
 
 def run_pipeline(file):
 
-    # Read raw data from yfinace api
+    # Read raw data from yfinance api
     df = pd.read_csv(file)
 
-    # preprocessing on raaw data
+    # preprocessing on raw data
     df, lookup_dict = preprocess(df)
 
     # removing nan values

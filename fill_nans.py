@@ -1,7 +1,8 @@
 import pandas as pd
 import numpy as np
 
-# TODO: logic for null "volumne"s
+# TODO: logic for null "volume"s
+
 
 def first_last_edge_case(data):
 
@@ -39,10 +40,9 @@ def get_subsets(nan_rows):
     # loop on i for all nan_rows in given column
     while i < (nan_rows.shape[0] - 1):
 
-        current_set = []
-        current_set.append(nan_rows[i])
+        current_set = [nan_rows[i]]
 
-        # possible nan row values to seach for
+        # possible nan row values to search for
         possible_sequences = np.arange(nan_rows[i] + 1, max_value + 1)
 
         # indexes for searching nan_rows and possible_sequences
@@ -91,7 +91,7 @@ def test_subsets(subsets_tensor, nan_rows_tensor):
                 items.append(subsets_tensor[i][j][0])
 
         if len(items) != nan_rows_tensor[i].shape[0]:
-            print("Error: Tensors at i =", i, "have mismatched dimentions")
+            print("Error: Tensors at i =", i, "have mismatched dimensions")
             tests_passed = False
         else:
             comparison_matrix = np.vstack((items, nan_rows_tensor[i])).T
@@ -165,8 +165,6 @@ def nan_filler(raw_data, subsets_tensor):
 def fill_nans(df):
 
     print("*" * 58 + "\n\tFilling NAN values in remaining series\n" + "*" * 58, "\n")
-
-
     datetime_data = df.index
 
     # remove datetime column

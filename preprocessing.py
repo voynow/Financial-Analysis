@@ -50,7 +50,7 @@ def columns_to_symbols(lookup_dict, columns):
     return np.unique(associated_symbols)
 
 
-def remove_NAN_columns(threshold, df, lookup_dict):
+def remove_nan_columns(threshold, df, lookup_dict):
 
     threshold_percentage = threshold * df.shape[0]
 
@@ -72,7 +72,7 @@ def remove_NAN_columns(threshold, df, lookup_dict):
     for item in unique_symbols:
         stock_drop_string += str(item) + ","
 
-    print("Dropping the following", len(unique_symbols) ,"stocks:")
+    print("Dropping the following", len(unique_symbols), "stocks:")
     print("-" * 58)
     print(stock_drop_string, "\n")
     df.drop(symbol_to_columns(lookup_dict, unique_symbols), axis=1, inplace=True)
@@ -86,11 +86,10 @@ def remove_NAN_columns(threshold, df, lookup_dict):
     print("-" * 58)
     print(stock_remaining_string, "\n")
 
-
     return df
 
 
-def preprocess(df, NAN_tolerance_threshold = 0.1):
+def preprocess(df, nan_tolerance_threshold = 0.1):
 
     datetime = "Datetime"
 
@@ -98,6 +97,6 @@ def preprocess(df, NAN_tolerance_threshold = 0.1):
     df.set_index(datetime, inplace=True)
 
     df, lookup_dict = prepare_dat(df)
-    df = remove_NAN_columns(NAN_tolerance_threshold, df, lookup_dict)
+    df = remove_nan_columns(nan_tolerance_threshold, df, lookup_dict)
 
     return df, lookup_dict
