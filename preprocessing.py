@@ -82,18 +82,17 @@ def remove_nan_columns(threshold, df, lookup_dict):
     for item in remaining_symbols:
         stock_remaining_string += str(item) + ","
 
-    print("Keeping the following", len(remaining_symbols) ,"stocks:")
+    print("Keeping the following", len(remaining_symbols), "stocks:")
     print("-" * 58)
     print(stock_remaining_string, "\n")
 
     return df
 
 
-def preprocess(df, nan_tolerance_threshold = 0.1):
+def preprocess(df, nan_tolerance_threshold=0.1):
 
     datetime = "Datetime"
-
-    df.rename(columns={df.columns[0] : datetime}, inplace=True)
+    df.rename(columns={df.columns[0]: datetime}, inplace=True)
     df.set_index(datetime, inplace=True)
 
     df, lookup_dict = prepare_dat(df)

@@ -24,7 +24,7 @@ def first_last_edge_case(data):
             index = 1
             while np.isnan(data[-1 * index, i]):
                 index += 1
-            data[-1, i] = np.copy(data[-1* index, i])
+            data[-1, i] = np.copy(data[-1 * index, i])
 
     return data
 
@@ -97,7 +97,7 @@ def test_subsets(subsets_tensor, nan_rows_tensor):
             comparison_matrix = np.vstack((items, nan_rows_tensor[i])).T
             difference = np.sum(np.diff(comparison_matrix, axis=1))
             if difference:
-                print("Error: Subset i =", i," is missing items from its associated nan_rows")
+                print("Error: Subset i =", i, " is missing items from its associated nan_rows")
                 tests_passed = False
 
     if tests_passed:
@@ -127,7 +127,7 @@ def get_nan_subsets(raw_data):
 
 
 def test_nan_fill(column, column_index, subset, first_index, last_index):
-    new_distances = np.diff(column[first_index - 1 : last_index + 2])
+    new_distances = np.diff(column[first_index - 1: last_index + 2])
     error_threshold = column[subset[0]] / 10e3
     difference_sum = np.sum(new_distances - new_distances[0])
 
@@ -150,7 +150,7 @@ def nan_filler(raw_data, subsets_tensor):
             subset_length = len(subset)
 
             linspace_values = np.linspace(column[first_index - 1], column[last_index + 1], subset_length + 2)
-            column[first_index : last_index + 1] = linspace_values[1:-1]
+            column[first_index: last_index + 1] = linspace_values[1:-1]
             raw_data[:, i] = column
 
             if not test_nan_fill(column, i, subset, first_index, last_index):
