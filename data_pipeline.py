@@ -18,7 +18,7 @@ def run_pipeline(file):
     df = pd.read_csv(file)
 
     # preprocessing on raw data
-    df, lookup_dict = preprocess(df)
+    df = preprocess(df)
 
     # removing nan values
     df = fill_nans(df)
