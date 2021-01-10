@@ -6,9 +6,7 @@ import numpy as np
 
 def first_last_edge_case(data):
 
-    """
-    Check for edge case of nan values in first or last position
-    """
+    """ Check for edge case of nan values in first or last position """
 
     for i in range(data.shape[1]):
 
