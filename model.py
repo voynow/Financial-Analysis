@@ -46,10 +46,13 @@ def build_model():
     return model
 
 
-dir_path = r"/Users/voyno/OneDrive/Desktop/Python_Projects/Financial_analysis/Data/1wk1m_0.csv"
+dir_path = r"../Data/1wk1m_0.csv"
+dir_list = ["../Data/1wk1m_0.csv", "../Data/1wk1m_1.csv"]
 
 # timeseries data for subset of Russ3000 stocks
-df = run_pipeline(dir_path)
+df = run_pipeline(dir_list)
+
+df.to_csv("../Data/test.csv")
 
 df_open = get_data_by_feature(df, "Open")
 df_close = get_data_by_feature(df, "Close")
@@ -86,4 +89,4 @@ x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2)
 y_train = y_train.flatten()
 y_test = y_test.flatten()
 
-build_model().fit(x_train, y_train, batch_size=4096, epochs=10, validation_data=(x_test, y_test))
+#build_model().fit(x_train, y_train, batch_size=4096, epochs=10, validation_data=(x_test, y_test))
