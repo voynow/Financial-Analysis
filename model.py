@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 from data_pipeline import run_pipeline
 
 from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score
 from keras.models import Sequential
 from keras.layers import Dense
 
@@ -50,9 +52,7 @@ dir_path = r"../Data/1wk1m_0.csv"
 dir_list = ["../Data/1wk1m_0.csv", "../Data/1wk1m_1.csv"]
 
 # timeseries data for subset of Russ3000 stocks
-df = run_pipeline(dir_list)
-
-df.to_csv("../Data/test.csv")
+df = run_pipeline(dir_path)
 
 df_open = get_data_by_feature(df, "Open")
 df_close = get_data_by_feature(df, "Close")
@@ -89,4 +89,9 @@ x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2)
 y_train = y_train.flatten()
 y_test = y_test.flatten()
 
-#build_model().fit(x_train, y_train, batch_size=4096, epochs=10, validation_data=(x_test, y_test))
+build_model().fit(x_train, y_train, batch_size=4096, epochs=10, validation_data=(x_test, y_test))
+
+random_forest = RandomForestClassifier()
+random_forest.fit(x_train, y_train)
+pred = random_forest.predict(x_test)
+print(accuracy_score(y_test, pred))
