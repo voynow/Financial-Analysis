@@ -115,7 +115,10 @@ def get_nan_subsets(raw_data):
         nan_rows_tensor.append(nan_rows)
 
         # convert nan rows into sets/strings of nan values
-        subsets = get_subsets(nan_rows)
+        if len(nan_rows):
+            subsets = get_subsets(nan_rows)
+        else:
+            subsets = []
         subsets_tensor.append(subsets)
 
     # verify conservation of data
