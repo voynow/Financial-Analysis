@@ -87,9 +87,12 @@ dir_list = ["../Data/1wk1m_0.csv", "../Data/1wk1m_1.csv", "../Data/1wk1m_2.csv"]
 # timeseries data for subset of Russ3000 stocks
 df = run_pipeline(dir_path)
 
-x, y = prep_data(df)
+x_train, y_train = prep_data(df)
 
-x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2)
+# x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2)
+
+df = run_pipeline("../Data/1wk1m_5.csv")
+x_test, y_test = prep_data(df)
 
 y_train = y_train.flatten()
 y_test = y_test.flatten()
