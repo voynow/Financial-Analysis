@@ -9,6 +9,8 @@ from sklearn.metrics import accuracy_score
 from keras.models import Sequential
 from keras.layers import Dense
 
+import time
+
 
 def get_data_by_feature(data, feature):
     col_names = data.columns
@@ -33,6 +35,37 @@ def feature_target_split(price_data, lag):
 
     return features, target
 
+def prep_data(df):
+    df_open = get_data_by_feature(df, "Open")
+    df_close = get_data_by_feature(df, "Close")
+
+    open_stocks = np.array([df_open.columns[i].split(".")[1] for i in range(len(df_open.columns))])
+    close_stocks = np.array([df_close.columns[i].split(".")[1] for i in range(len(df_close.columns))])
+
+    if np.array_equal(open_stocks, close_stocks):
+        print("Test Passed: attributes contain matching stocks")
+    else:
+        print("ERROR: mismatched stocks exist between open_df and close_df")
+
+    column_space = len(df_open.columns)
+    columns = [df_open.columns[i].split('.')[1] for i in range(column_space)]
+
+    price_change_data = np.array([df_close[df_close.columns[i]].values - df_open[df_open.columns[i]].values for i in range(column_space)])
+    price_change_df = pd.DataFrame(price_change_data.T, columns=columns)
+
+    x = []
+    y = []
+    for i in range(column_space):
+        data_split = feature_target_split(price_change_data[i], 50)
+        x.append(data_split[0])
+        y.append(data_split[1])
+
+    x = np.array(x)
+    y = np.array(y)
+
+    x = np.concatenate([x[i] for i in range(x.shape[0])])
+    y = np.concatenate([y[i] for i in range(y.shape[0])]).reshape(x.shape[0], 1)
+    return x, y
 
 def build_model():
 
@@ -49,49 +82,27 @@ def build_model():
 
 
 dir_path = r"../Data/1wk1m_0.csv"
-dir_list = ["../Data/1wk1m_0.csv", "../Data/1wk1m_1.csv"]
+dir_list = ["../Data/1wk1m_0.csv", "../Data/1wk1m_1.csv", "../Data/1wk1m_2.csv"]
 
 # timeseries data for subset of Russ3000 stocks
 df = run_pipeline(dir_path)
 
-df_open = get_data_by_feature(df, "Open")
-df_close = get_data_by_feature(df, "Close")
-
-open_stocks = np.array([df_open.columns[i].split(".")[1] for i in range(len(df_open.columns))])
-close_stocks = np.array([df_close.columns[i].split(".")[1] for i in range(len(df_close.columns))])
-
-if np.array_equal(open_stocks, close_stocks):
-    print("Test Passed: attributes contain matching stocks")
-else:
-    print("ERROR: mismatched stocks exist between open_df and close_df")
-
-column_space = len(df_open.columns)
-columns = [df_open.columns[i].split('.')[1] for i in range(column_space)]
-
-price_change_data = np.array([df_close[df_close.columns[i]].values - df_open[df_open.columns[i]].values for i in range(column_space)])
-price_change_df = pd.DataFrame(price_change_data.T, columns=columns)
-
-x = []
-y = []
-for i in range(column_space):
-    data_split = feature_target_split(price_change_data[i], 50)
-    x.append(data_split[0])
-    y.append(data_split[1])
-
-x = np.array(x)
-y = np.array(y)
-
-x = np.concatenate([x[i] for i in range(x.shape[0])])
-y = np.concatenate([y[i] for i in range(y.shape[0])]).reshape(x.shape[0], 1)
+x, y = prep_data(df)
 
 x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2)
 
 y_train = y_train.flatten()
 y_test = y_test.flatten()
 
+start = time.time()
 build_model().fit(x_train, y_train, batch_size=4096, epochs=10, validation_data=(x_test, y_test))
+end = time.time()
+print(end-start)
 
-random_forest = RandomForestClassifier()
+start = time.time()
+random_forest = RandomForestClassifier(n_jobs=-1)
 random_forest.fit(x_train, y_train)
 pred = random_forest.predict(x_test)
+end = time.time()
 print(accuracy_score(y_test, pred))
+print(end-start)
