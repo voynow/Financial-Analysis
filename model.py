@@ -82,7 +82,7 @@ def build_model():
 
 def build_cnn():
     model = Sequential()
-    model.add(Conv1D(32, 3, activation='relu', input_shape=(860700, 51)))
+    model.add(Conv1D(32, 3, activation='relu'))
     model.add(Flatten())
     model.add(Dense(1, activation='sigmoid'))
     model.compile(optimizer="adam", loss="binary_crossentropy", metrics=['acc'])
@@ -97,8 +97,6 @@ df = run_pipeline(dir_path)
 
 x_train, y_train = prep_data(df)
 
-print(x_train.shape)
-
 # x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2)
 
 df = run_pipeline("../Data/1wk1m_5.csv")
@@ -106,6 +104,11 @@ x_test, y_test = prep_data(df)
 
 y_train = y_train.flatten()
 y_test = y_test.flatten()
+
+print(x_train.shape)
+print(y_train.shape)
+print(x_test.shape)
+print(y_test.shape)
 
 # start = time.time()
 # build_model().fit(x_train, y_train, batch_size=4096, epochs=10, validation_data=(x_test, y_test))
