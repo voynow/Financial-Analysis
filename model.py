@@ -7,7 +7,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 from keras.models import Sequential
-from keras.layers import Dense
+from keras.layers import Dense, Conv1D, Flatten
 
 import time
 
@@ -80,6 +80,14 @@ def build_model():
 
     return model
 
+def build_cnn():
+    model = Sequential()
+    model.add(Conv1D(32, 3, activation='relu', input_shape=(860700, 51)))
+    model.add(Flatten())
+    model.add(Dense(1, activation='sigmoid'))
+    model.compile(optimizer="adam", loss="binary_crossentropy", metrics=['acc'])
+    return model
+
 
 dir_path = r"../Data/1wk1m_0.csv"
 dir_list = ["../Data/1wk1m_0.csv", "../Data/1wk1m_1.csv", "../Data/1wk1m_2.csv"]
@@ -89,6 +97,8 @@ df = run_pipeline(dir_path)
 
 x_train, y_train = prep_data(df)
 
+print(x_train.shape)
+
 # x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2)
 
 df = run_pipeline("../Data/1wk1m_5.csv")
@@ -97,15 +107,17 @@ x_test, y_test = prep_data(df)
 y_train = y_train.flatten()
 y_test = y_test.flatten()
 
-start = time.time()
-build_model().fit(x_train, y_train, batch_size=4096, epochs=10, validation_data=(x_test, y_test))
-end = time.time()
-print(end-start)
+# start = time.time()
+# build_model().fit(x_train, y_train, batch_size=4096, epochs=10, validation_data=(x_test, y_test))
+# end = time.time()
+# print(end-start)
 
-start = time.time()
-random_forest = RandomForestClassifier(n_jobs=-1)
-random_forest.fit(x_train, y_train)
-pred = random_forest.predict(x_test)
-end = time.time()
-print(accuracy_score(y_test, pred))
-print(end-start)
+# start = time.time()
+# random_forest = RandomForestClassifier(n_jobs=-1)
+# random_forest.fit(x_train, y_train)
+# pred = random_forest.predict(x_test)
+# end = time.time()
+# print(accuracy_score(y_test, pred))
+# print(end-start)
+
+build_cnn().fit(x_train, y_train, batch_size=4096, epochs=10, validation_data=(x_test, y_test))
