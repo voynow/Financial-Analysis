@@ -83,6 +83,7 @@ def build_model():
 def build_cnn():
     model = Sequential()
     model.add(Conv1D(32, 3, activation='relu'))
+    model.add(Conv1D(32, 3, activation='relu'))
     model.add(Flatten())
     model.add(Dense(1, activation='sigmoid'))
     model.compile(optimizer="adam", loss="binary_crossentropy", metrics=['acc'])
@@ -110,10 +111,10 @@ print(y_train.shape)
 print(x_test.shape)
 print(y_test.shape)
 
-# start = time.time()
-# build_model().fit(x_train, y_train, batch_size=4096, epochs=10, validation_data=(x_test, y_test))
-# end = time.time()
-# print(end-start)
+start = time.time()
+build_model().fit(x_train, y_train, batch_size=4096, epochs=10, validation_data=(x_test, y_test))
+end = time.time()
+print(end-start)
 
 # start = time.time()
 # random_forest = RandomForestClassifier(n_jobs=-1)
@@ -123,4 +124,9 @@ print(y_test.shape)
 # print(accuracy_score(y_test, pred))
 # print(end-start)
 
-build_cnn().fit(x_train, y_train, batch_size=4096, epochs=10, validation_data=(x_test, y_test))
+# start = time.time()
+# x_train = x_train[:, :, np.newaxis]
+# x_test = x_test[:, :, np.newaxis]
+# build_cnn().fit(x_train, y_train, batch_size=4096, epochs=10, validation_data=(x_test, y_test))
+# end = time.time()
+# print(end-start)
