@@ -35,6 +35,23 @@ def feature_target_split(price_data, lag):
 
     return features, target
 
+def feature_target_split_rnn(price_data, lag, timesteps):
+    features = np.zeros((price_data.shape[0] - lag, lag + 1))
+    target = np.zeros((price_data.shape[0] - lag, timesteps))
+    
+    price_data = normalize(price_data)
+    
+    timestep_data = np.zeros(timesteps)
+    
+    for i in range(lag, price_data.shape[0] - timesteps):
+        price_features = price_data[i - lag:i]
+        features[i - lag] = np.hstack((price_features, np.mean(price_features)))
+        for j in range(timesteps):
+            timestep_data[j] = (price_data[i+j] > 0) * 1
+        target[i - lag] = timestep_data
+        
+    return features, target
+
 def prep_data(df):
     df_open = get_data_by_feature(df, "Open")
     df_close = get_data_by_feature(df, "Close")
