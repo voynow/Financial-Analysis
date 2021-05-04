@@ -7,7 +7,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 from keras.models import Sequential
-from keras.layers import Dense, Conv1D, Flatten
+from keras.layers import Dense, Conv1D, Flatten, SimpleRNN
 
 import time
 
@@ -52,7 +52,7 @@ def prep_data(df):
 
     price_change_data = np.array([df_close[df_close.columns[i]].values - df_open[df_open.columns[i]].values for i in range(column_space)])
     price_change_df = pd.DataFrame(price_change_data.T, columns=columns)
-
+    
     x = []
     y = []
     for i in range(column_space):
@@ -89,6 +89,14 @@ def build_cnn():
     model.compile(optimizer="adam", loss="binary_crossentropy", metrics=['acc'])
     return model
 
+def build_rnn():
+    model = Sequential()
+    model.add(SimpleRNN(32, return_sequences=True))
+    model.add(Flatten())
+    model.add(Dense(1, activation='sigmoid'))
+    model.compile(optimizer="adam", loss="binary_crossentropy", metrics=['acc'])
+    return model
+
 
 dir_path = r"../Data/1wk1m_0.csv"
 dir_list = ["../Data/1wk1m_0.csv", "../Data/1wk1m_1.csv", "../Data/1wk1m_2.csv"]
@@ -111,10 +119,10 @@ print(y_train.shape)
 print(x_test.shape)
 print(y_test.shape)
 
-start = time.time()
-build_model().fit(x_train, y_train, batch_size=4096, epochs=10, validation_data=(x_test, y_test))
-end = time.time()
-print(end-start)
+# start = time.time()
+# build_model().fit(x_train, y_train, batch_size=4096, epochs=10, validation_data=(x_test, y_test))
+# end = time.time()
+# print(end-start)
 
 # start = time.time()
 # random_forest = RandomForestClassifier(n_jobs=-1)
@@ -124,9 +132,18 @@ print(end-start)
 # print(accuracy_score(y_test, pred))
 # print(end-start)
 
-# start = time.time()
 # x_train = x_train[:, :, np.newaxis]
 # x_test = x_test[:, :, np.newaxis]
+# start = time.time()
 # build_cnn().fit(x_train, y_train, batch_size=4096, epochs=10, validation_data=(x_test, y_test))
 # end = time.time()
 # print(end-start)
+
+x_train = x_train[:, :, np.newaxis]
+x_test = x_test[:, :, np.newaxis]
+start = time.time()
+model = build_rnn()
+model.fit(x_train, y_train, batch_size=4096, epochs=10)
+model.predict(x_test)
+end = time.time()
+print(end-start)
