@@ -7,7 +7,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 from keras.models import Sequential
-from keras.layers import Dense, Conv1D, Flatten, SimpleRNN
+from keras.layers import Dense, Conv1D, Flatten, SimpleRNN, GRU, LSTM
 
 import time
 
@@ -108,7 +108,7 @@ def build_cnn():
 
 def build_rnn():
     model = Sequential()
-    model.add(SimpleRNN(32, return_sequences=True))
+    model.add(LSTM(32, return_sequences=True))
     model.add(Flatten())
     model.add(Dense(1, activation='sigmoid'))
     model.compile(optimizer="adam", loss="binary_crossentropy", metrics=['acc'])
@@ -160,7 +160,7 @@ x_train = x_train[:, :, np.newaxis]
 x_test = x_test[:, :, np.newaxis]
 start = time.time()
 model = build_rnn()
-model.fit(x_train, y_train, batch_size=4096, epochs=10)
+model.fit(x_train, y_train, batch_size=4096, epochs=10, validation_data=(x_test, y_test)) 
 model.predict(x_test)
 end = time.time()
 print(end-start)
