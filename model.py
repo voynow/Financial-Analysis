@@ -35,23 +35,6 @@ def feature_target_split(price_data, lag):
 
     return features, target
 
-def feature_target_split_rnn(price_data, lag, timesteps):
-    features = np.zeros((price_data.shape[0] - lag, lag + 1))
-    target = np.zeros((price_data.shape[0] - lag, timesteps))
-    
-    price_data = normalize(price_data)
-    
-    timestep_data = np.zeros(timesteps)
-    
-    for i in range(lag, price_data.shape[0] - timesteps):
-        price_features = price_data[i - lag:i]
-        features[i - lag] = np.hstack((price_features, np.mean(price_features)))
-        for j in range(timesteps):
-            timestep_data[j] = (price_data[i+j] > 0) * 1
-        target[i - lag] = timestep_data
-        
-    return features, target
-
 def prep_data(df):
     df_open = get_data_by_feature(df, "Open")
     df_close = get_data_by_feature(df, "Close")
@@ -100,7 +83,7 @@ def build_model():
 def build_cnn():
     model = Sequential()
     model.add(Conv1D(32, 3, activation='relu'))
-    model.add(Conv1D(32, 3, activation='relu'))
+    model.add(Conv1D(32, 6, activation='relu'))
     model.add(Flatten())
     model.add(Dense(1, activation='sigmoid'))
     model.compile(optimizer="adam", loss="binary_crossentropy", metrics=['acc'])
@@ -119,7 +102,7 @@ dir_path = r"../Data/1wk1m_0.csv"
 dir_list = ["../Data/1wk1m_0.csv", "../Data/1wk1m_1.csv", "../Data/1wk1m_2.csv"]
 
 # timeseries data for subset of Russ3000 stocks
-df = run_pipeline(dir_path)
+df = run_pipeline(dir_list)
 
 x_train, y_train = prep_data(df)
 
@@ -149,18 +132,18 @@ print(y_test.shape)
 # print(accuracy_score(y_test, pred))
 # print(end-start)
 
-# x_train = x_train[:, :, np.newaxis]
-# x_test = x_test[:, :, np.newaxis]
-# start = time.time()
-# build_cnn().fit(x_train, y_train, batch_size=4096, epochs=10, validation_data=(x_test, y_test))
-# end = time.time()
-# print(end-start)
-
 x_train = x_train[:, :, np.newaxis]
 x_test = x_test[:, :, np.newaxis]
 start = time.time()
-model = build_rnn()
-model.fit(x_train, y_train, batch_size=4096, epochs=10, validation_data=(x_test, y_test)) 
-model.predict(x_test)
+build_cnn().fit(x_train, y_train, batch_size=4096, epochs=10, validation_data=(x_test, y_test))
 end = time.time()
 print(end-start)
+
+# x_train = x_train[:, :, np.newaxis]
+# x_test = x_test[:, :, np.newaxis]
+# start = time.time()
+# model = build_rnn()
+# model.fit(x_train, y_train, batch_size=4096, epochs=10, validation_data=(x_test, y_test)) 
+# model.predict(x_test)
+# end = time.time()
+# print(end-start)
