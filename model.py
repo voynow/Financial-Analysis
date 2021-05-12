@@ -7,7 +7,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 from keras.models import Sequential
-from keras.layers import Dense
+from keras.layers import Dense, Conv1D, Flatten, SimpleRNN, GRU, LSTM
 
 import time
 
@@ -52,7 +52,7 @@ def prep_data(df):
 
     price_change_data = np.array([df_close[df_close.columns[i]].values - df_open[df_open.columns[i]].values for i in range(column_space)])
     price_change_df = pd.DataFrame(price_change_data.T, columns=columns)
-
+    
     x = []
     y = []
     for i in range(column_space):
@@ -80,12 +80,30 @@ def build_model():
 
     return model
 
+def build_cnn():
+    model = Sequential()
+    model.add(Conv1D(32, 3, activation='relu'))
+    model.add(Conv1D(32, 6, activation='relu'))
+    model.add(Conv1D(32, 3, activation='relu'))
+    model.add(Flatten())
+    model.add(Dense(1, activation='sigmoid'))
+    model.compile(optimizer="adam", loss="binary_crossentropy", metrics=['acc'])
+    return model
+
+def build_rnn():
+    model = Sequential()
+    model.add(LSTM(128, return_sequences=True))
+    model.add(Flatten())
+    model.add(Dense(1, activation='sigmoid'))
+    model.compile(optimizer="adam", loss="binary_crossentropy", metrics=['acc'])
+    return model
+
 
 dir_path = r"../Data/1wk1m_0.csv"
 dir_list = ["../Data/1wk1m_0.csv", "../Data/1wk1m_1.csv", "../Data/1wk1m_2.csv"]
 
 # timeseries data for subset of Russ3000 stocks
-df = run_pipeline(dir_path)
+df = run_pipeline(dir_list)
 
 x_train, y_train = prep_data(df)
 
@@ -97,15 +115,36 @@ x_test, y_test = prep_data(df)
 y_train = y_train.flatten()
 y_test = y_test.flatten()
 
+print(x_train.shape)
+print(y_train.shape)
+print(x_test.shape)
+print(y_test.shape)
+
+# start = time.time()
+# build_model().fit(x_train, y_train, batch_size=4096, epochs=10, validation_data=(x_test, y_test))
+# end = time.time()
+# print(end-start)
+
+# start = time.time()
+# random_forest = RandomForestClassifier(n_jobs=-1)
+# random_forest.fit(x_train, y_train)
+# pred = random_forest.predict(x_test)
+# end = time.time()
+# print(accuracy_score(y_test, pred))
+# print(end-start)
+
+x_train = x_train[:, :, np.newaxis]
+x_test = x_test[:, :, np.newaxis]
 start = time.time()
-build_model().fit(x_train, y_train, batch_size=4096, epochs=10, validation_data=(x_test, y_test))
+build_cnn().fit(x_train, y_train, batch_size=4096, epochs=10, validation_data=(x_test, y_test))
 end = time.time()
 print(end-start)
 
-start = time.time()
-random_forest = RandomForestClassifier(n_jobs=-1)
-random_forest.fit(x_train, y_train)
-pred = random_forest.predict(x_test)
-end = time.time()
-print(accuracy_score(y_test, pred))
-print(end-start)
+# x_train = x_train[:, :, np.newaxis]
+# x_test = x_test[:, :, np.newaxis]
+# start = time.time()
+# model = build_rnn()
+# model.fit(x_train, y_train, batch_size=4096, epochs=10, validation_data=(x_test, y_test)) 
+# model.predict(x_test)
+# end = time.time()
+# print(end-start)
