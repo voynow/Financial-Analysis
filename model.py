@@ -133,18 +133,18 @@ print(y_test.shape)
 # print(accuracy_score(y_test, pred))
 # print(end-start)
 
-# x_train = x_train[:, :, np.newaxis]
-# x_test = x_test[:, :, np.newaxis]
-# start = time.time()
-# build_cnn().fit(x_train, y_train, batch_size=4096, epochs=10, validation_data=(x_test, y_test))
-# end = time.time()
-# print(end-start)
-
 x_train = x_train[:, :, np.newaxis]
 x_test = x_test[:, :, np.newaxis]
 start = time.time()
-model = build_rnn()
-model.fit(x_train, y_train, batch_size=4096, epochs=10, validation_data=(x_test, y_test)) 
-model.predict(x_test)
+build_cnn().fit(x_train, y_train, batch_size=4096, epochs=10, validation_data=(x_test, y_test))
 end = time.time()
 print(end-start)
+
+# x_train = x_train[:, :, np.newaxis]
+# x_test = x_test[:, :, np.newaxis]
+# start = time.time()
+# model = build_rnn()
+# model.fit(x_train, y_train, batch_size=4096, epochs=10, validation_data=(x_test, y_test)) 
+# model.predict(x_test)
+# end = time.time()
+# print(end-start)
