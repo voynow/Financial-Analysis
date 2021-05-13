@@ -23,14 +23,14 @@ def normalize(x):
 
 
 def feature_target_split(price_data, lag):
-    features = np.zeros((price_data.shape[0] - lag, lag + 1))
+    features = np.zeros((price_data.shape[0] - lag, lag + 0))
     target = np.zeros(price_data.shape[0] - lag)
 
     price_data = normalize(price_data)
 
     for i in range(lag, price_data.shape[0]):
         price_features = price_data[i - lag:i]
-        features[i - lag] = np.hstack((price_features, np.mean(price_features)))
+        features[i - lag] = np.hstack((price_features))
         target[i - lag] = (price_data[i] > 0) * 1
 
     return features, target
@@ -73,7 +73,6 @@ def build_model():
 
     model.add(Dense(32, activation='relu'))
     model.add(Dense(32, activation='relu'))
-    model.add(Dense(32, activation='sigmoid'))
     model.add(Dense(1, activation='sigmoid'))
 
     model.compile(optimizer="adam", loss="binary_crossentropy", metrics=['acc'])
@@ -84,6 +83,8 @@ def build_cnn():
     model = Sequential()
     model.add(Conv1D(32, 3, activation='relu'))
     model.add(Conv1D(32, 6, activation='relu'))
+    model.add(Conv1D(32, 9, activation='relu'))
+    model.add(Conv1D(32, 6, activation='relu'))
     model.add(Conv1D(32, 3, activation='relu'))
     model.add(Flatten())
     model.add(Dense(1, activation='sigmoid'))
@@ -92,7 +93,9 @@ def build_cnn():
 
 def build_rnn():
     model = Sequential()
-    model.add(LSTM(128, return_sequences=True))
+    model.add(LSTM(32, return_sequences=True))
+    model.add(LSTM(32, return_sequences=True))
+    model.add(LSTM(32))
     model.add(Flatten())
     model.add(Dense(1, activation='sigmoid'))
     model.compile(optimizer="adam", loss="binary_crossentropy", metrics=['acc'])
@@ -121,7 +124,8 @@ print(x_test.shape)
 print(y_test.shape)
 
 # start = time.time()
-# build_model().fit(x_train, y_train, batch_size=4096, epochs=10, validation_data=(x_test, y_test))
+# model = build_model()
+# model.fit(x_train, y_train, batch_size=4096, epochs=10, validation_data=(x_test, y_test))
 # end = time.time()
 # print(end-start)
 
@@ -133,18 +137,18 @@ print(y_test.shape)
 # print(accuracy_score(y_test, pred))
 # print(end-start)
 
-x_train = x_train[:, :, np.newaxis]
-x_test = x_test[:, :, np.newaxis]
-start = time.time()
-build_cnn().fit(x_train, y_train, batch_size=4096, epochs=10, validation_data=(x_test, y_test))
-end = time.time()
-print(end-start)
-
 # x_train = x_train[:, :, np.newaxis]
 # x_test = x_test[:, :, np.newaxis]
 # start = time.time()
-# model = build_rnn()
-# model.fit(x_train, y_train, batch_size=4096, epochs=10, validation_data=(x_test, y_test)) 
-# model.predict(x_test)
+# build_cnn().fit(x_train, y_train, batch_size=4096, epochs=10, validation_data=(x_test, y_test))
 # end = time.time()
 # print(end-start)
+
+x_train = x_train[:, :, np.newaxis]
+x_test = x_test[:, :, np.newaxis]
+start = time.time()
+model = build_rnn()
+model.fit(x_train, y_train, batch_size=4096, epochs=10, validation_data=(x_test, y_test)) 
+model.predict(x_test)
+end = time.time()
+print(end-start)
