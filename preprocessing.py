@@ -74,15 +74,21 @@ def remove_nan_columns(threshold, df):
     return df
 
 
-def preprocess(df, nan_tolerance_threshold=0.1):
+def preprocess(dfs, nan_tolerance_threshold=0.1):
 
-    # update column names and index
     datetime = "Datetime"
-    df.rename(columns={df.columns[0]: datetime}, inplace=True)
-    df.set_index(datetime, inplace=True)
 
-    # run preprocessing functions
-    df = prepare_dat(df)
+    # iterate over dfs
+    for i in range(len(dfs)):
+
+        # update column names and index
+        dfs[i].rename(columns={dfs[i].columns[0]: datetime}, inplace=True)
+        dfs[i].set_index(datetime, inplace=True)
+
+        # prepare dataframes for concatenation
+        dfs[i] = prepare_dat(dfs[i])
+    
+    df = pd.concat(dfs)
     df = remove_nan_columns(nan_tolerance_threshold, df)
 
     return df
